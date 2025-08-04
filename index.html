@@ -1,6 +1,24 @@
 <!DOCTYPE html>
 <html lang="en">
   <head>
+    <script
+      async
+      src="https://www.googletagmanager.com/gtag/js?id=G-F8NG3PRSDP"
+    ></script>
+    <script>
+      // Define gtag() immediately so it's available to all your scripts
+      window.dataLayer = window.dataLayer || [];
+      function gtag() {
+        dataLayer.push(arguments);
+      }
+
+      // Wait for DOM to load before configuring GA (your working model)
+      window.addEventListener("DOMContentLoaded", function () {
+        gtag("js", new Date());
+        gtag("config", "G-F8NG3PRSDP", { debug_mode: true }); // ✅ Required for DebugView
+      });
+    </script>
+
     <meta charset="UTF-8" />
     <title>Coach-Parent Ethics Tool</title>
 
@@ -271,7 +289,7 @@
         <!-- ──────────────── 4 · Safe-Sport / welfare ──────────────── -->
         <section id="slide-4" class="slide">
           <h2 class="text-xl font-semibold mb-4 text-emerald-700">
-            Safe Sport &amp; player welfare
+            Player Welfare &amp; Safe Sport
           </h2>
 
           <div class="mb-5">
@@ -592,7 +610,7 @@
   </div>
 
   <div class="poster-section border-b">
-    <h2 class="poster-title text-2xl mb-2">Safe Sport / Welfare</h2>
+    <h2 class="poster-title text-2xl mb-2">Player Welfare / Safe Sport</h2>
     <ul class="space-y-2 text-base">
       ${
         s.forms
