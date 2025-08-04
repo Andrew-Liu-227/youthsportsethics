@@ -1,0 +1,690 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Coach-Parent Ethics Tool</title>
+
+    <!-- Google Fonts & Tailwind (CDN) -->
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;700&family=Playfair+Display:wght@700&display=swap"
+      rel="stylesheet"
+    />
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <!-- jsPDF & html2canvas (CDN) -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+
+    <style>
+      .slide {
+        display: none;
+      }
+      .slide.active {
+        display: block;
+      }
+      #posterPreview {
+        width: 680px;
+        min-height: 1056px;
+        background: #fff;
+        border: 1px solid #e5e7eb;
+        font-family: "Inter", sans-serif;
+        margin-inline: auto;
+      }
+      .poster-section {
+        padding: 1rem 1.5rem;
+      }
+      .poster-title {
+        font-family: "Playfair Display", serif;
+      }
+    </style>
+  </head>
+
+  <body class="bg-emerald-50 text-slate-900 leading-relaxed">
+    <div class="max-w-3xl mx-auto p-6">
+      <h1 class="text-3xl font-bold mb-2 text-emerald-800">
+        Coach-Parent Ethics Tool
+      </h1>
+      <p class="mb-6 text-slate-600">
+        Coaches: answer a few questions—then preview a formal PDF for your
+        team’s parents.
+      </p>
+
+      <!-- progress bar -->
+      <div class="w-full bg-emerald-200 h-2 rounded mb-8">
+        <div
+          id="progressBar"
+          class="h-full bg-emerald-600 rounded transition-all"
+        ></div>
+      </div>
+
+      <form id="wizardForm">
+        <!-- ──────────────── 0 · Intro ──────────────── -->
+        <section id="slide-0" class="slide active">
+          <h2 class="text-xl font-semibold mb-4 text-emerald-700">Welcome!</h2>
+          <p class="mb-6">
+            Input custom team details, values, parent guidelines, and athlete
+            safety info, then get a printable PDF to share.
+          </p>
+          <button
+            type="button"
+            class="px-4 py-2 bg-emerald-600 text-white rounded"
+            onclick="nextSlide()"
+          >
+            Start
+          </button>
+        </section>
+
+        <!-- ──────────────── 1 · Team profile ──────────────── -->
+        <section id="slide-1" class="slide">
+          <h2 class="text-xl font-semibold mb-4 text-emerald-700">
+            Team profile
+          </h2>
+
+          <div class="mb-4">
+            <label class="block font-medium mb-1" for="teamName"
+              >Team name</label
+            >
+            <input id="teamName" required class="w-full p-2 border rounded" />
+          </div>
+
+          <div class="mb-4 grid grid-cols-2 gap-4">
+            <div>
+              <label class="block font-medium mb-1" for="sport">Sport</label>
+              <input id="sport" required class="w-full p-2 border rounded" />
+            </div>
+            <div>
+              <label class="block font-medium mb-1" for="ageGroup"
+                >Age group (e.g., U10)</label
+              >
+              <input id="ageGroup" required class="w-full p-2 border rounded" />
+            </div>
+          </div>
+
+          <div class="mb-4 grid grid-cols-2 gap-4">
+            <div>
+              <label class="block font-medium mb-1" for="location"
+                >City / State</label
+              ><input
+                id="location"
+                required
+                class="w-full p-2 border rounded"
+              />
+            </div>
+            <div>
+              <label class="block font-medium mb-1" for="coachEmail"
+                >Coach email</label
+              ><input
+                id="coachEmail"
+                type="email"
+                required
+                class="w-full p-2 border rounded"
+                placeholder="coach@example.com"
+              />
+            </div>
+          </div>
+
+          <div class="flex justify-between">
+            <button
+              type="button"
+              class="px-4 py-2 bg-emerald-200 rounded"
+              onclick="prevSlide()"
+            >
+              Back
+            </button>
+            <button
+              type="button"
+              class="px-4 py-2 bg-emerald-600 text-white rounded"
+              onclick="nextSlide()"
+            >
+              Next
+            </button>
+          </div>
+        </section>
+
+        <!-- ──────────────── 2 · Core values ──────────────── -->
+        <section id="slide-2" class="slide">
+          <h2 class="text-xl font-semibold mb-4 text-emerald-700">
+            Choose core values
+          </h2>
+          <p class="mb-2 text-sm text-slate-600">
+            Pick 3–6 values that guide your program.
+          </p>
+
+          <div id="valuesGrid" class="grid grid-cols-2 gap-2 mb-4">
+            <label class="flex items-center gap-2"
+              ><input
+                type="checkbox"
+                class="valueChk"
+                value="Sportsmanship"
+              />Sportsmanship</label
+            >
+            <label class="flex items-center gap-2"
+              ><input
+                type="checkbox"
+                class="valueChk"
+                value="Respect"
+              />Respect</label
+            >
+            <label class="flex items-center gap-2"
+              ><input
+                type="checkbox"
+                class="valueChk"
+                value="Teamwork"
+              />Teamwork</label
+            >
+            <label class="flex items-center gap-2"
+              ><input type="checkbox" class="valueChk" value="Fun" />Fun</label
+            >
+            <label class="flex items-center gap-2"
+              ><input
+                type="checkbox"
+                class="valueChk"
+                value="Growth Mindset"
+              />Growth&nbsp;Mindset</label
+            >
+            <label class="flex items-center gap-2"
+              ><input
+                type="checkbox"
+                class="valueChk"
+                value="Safety"
+              />Safety</label
+            >
+            <label class="flex items-center gap-2"
+              ><input
+                type="checkbox"
+                class="valueChk"
+                value="Inclusivity"
+              />Inclusivity</label
+            >
+            <label class="flex items-center gap-2"
+              ><input
+                type="checkbox"
+                class="valueChk"
+                value="Integrity"
+              />Integrity</label
+            >
+          </div>
+
+          <div class="mb-6">
+            <label class="block font-medium mb-1" for="customValue"
+              >Add your own (optional)</label
+            >
+            <div class="flex gap-2">
+              <input
+                id="customValue"
+                class="flex-1 p-2 border rounded"
+                placeholder="Enter custom value"
+              />
+              <button
+                type="button"
+                class="px-3 py-1 bg-emerald-700 text-white rounded"
+                onclick="addCustomValue()"
+              >
+                Add
+              </button>
+            </div>
+          </div>
+
+          <div class="flex justify-between">
+            <button
+              type="button"
+              class="px-4 py-2 bg-emerald-200 rounded"
+              onclick="prevSlide()"
+            >
+              Back
+            </button>
+            <button
+              type="button"
+              class="px-4 py-2 bg-emerald-600 text-white rounded"
+              onclick="nextSlide()"
+            >
+              Next
+            </button>
+          </div>
+        </section>
+
+        <!-- ──────────────── 3 · Parent guidelines ──────────────── -->
+        <section id="slide-3" class="slide">
+          <h2 class="text-xl font-semibold mb-4 text-emerald-700">
+            Parent engagement guidelines
+          </h2>
+          <div id="guidelineGroups"></div>
+
+          <div class="flex justify-between mt-6">
+            <button
+              type="button"
+              class="px-4 py-2 bg-emerald-200 rounded"
+              onclick="prevSlide()"
+            >
+              Back
+            </button>
+            <button
+              type="button"
+              class="px-4 py-2 bg-emerald-600 text-white rounded"
+              onclick="nextSlide()"
+            >
+              Next
+            </button>
+          </div>
+        </section>
+
+        <!-- ──────────────── 4 · Safe-Sport / welfare ──────────────── -->
+        <section id="slide-4" class="slide">
+          <h2 class="text-xl font-semibold mb-4 text-emerald-700">
+            Safe Sport &amp; player welfare
+          </h2>
+
+          <div class="mb-5">
+            <label class="block font-medium mb-1" for="safeForms"
+              >Forms parents need to sign</label
+            >
+            <textarea
+              id="safeForms"
+              rows="3"
+              class="w-full p-2 border rounded"
+              placeholder="e.g., Medical release, Code-of-Conduct form"
+            ></textarea>
+          </div>
+
+          <div class="mb-5">
+            <label class="block font-medium mb-1" for="safeApps"
+              >Apps or accounts parents need to download</label
+            >
+            <textarea
+              id="safeApps"
+              rows="3"
+              class="w-full p-2 border rounded"
+              placeholder="e.g., TeamSnap, LeagueApps"
+            ></textarea>
+          </div>
+
+          <div class="mb-5">
+            <label class="block font-medium mb-1" for="safeResources"
+              >Online resources parents should read</label
+            >
+            <textarea
+              id="safeResources"
+              rows="3"
+              class="w-full p-2 border rounded"
+              placeholder="e.g., https://www.usopc.org/safe-sport"
+            ></textarea>
+          </div>
+
+          <div class="mb-6">
+            <label class="block font-medium mb-1" for="safeAdditional"
+              >Additional player-safety info</label
+            >
+            <textarea
+              id="safeAdditional"
+              rows="3"
+              class="w-full p-2 border rounded"
+              placeholder="Any extra notes"
+            ></textarea>
+          </div>
+
+          <div class="flex justify-between">
+            <button
+              type="button"
+              class="px-4 py-2 bg-emerald-200 rounded"
+              onclick="prevSlide()"
+            >
+              Back
+            </button>
+            <button
+              type="button"
+              class="px-4 py-2 bg-emerald-600 text-white rounded"
+              onclick="nextSlide()"
+            >
+              Next
+            </button>
+          </div>
+        </section>
+
+        <!-- ──────────────── 5 · Preview & PDF ──────────────── -->
+        <section id="slide-5" class="slide">
+          <h2 class="text-xl font-semibold mb-4 text-emerald-700">
+            Preview &amp; PDF
+          </h2>
+          <div id="posterPreview" class="mb-6"></div>
+          <div class="flex justify-between">
+            <button
+              type="button"
+              class="px-4 py-2 bg-emerald-200 rounded"
+              onclick="prevSlide()"
+            >
+              Back
+            </button>
+            <button
+              type="button"
+              id="previewBtn"
+              class="px-4 py-2 bg-emerald-600 text-white rounded"
+              onclick="previewPDF()"
+            >
+              Preview PDF
+            </button>
+          </div>
+        </section>
+      </form>
+    </div>
+
+    <script>
+      /* === Global state ======================================================== */
+      const totalSlides = 6;
+      let currentSlide = 0;
+      const state = {
+        teamName: "",
+        sport: "",
+        ageGroup: "",
+        location: "",
+        coachEmail: "",
+        values: [],
+        guidelines: { sideline: [], comm: [], attendance: [], social: [] },
+        safeSport: { forms: "", apps: "", resources: "", additional: "" },
+      };
+
+      /* === Guideline templates ================================================ */
+      const defaultGuidelines = {
+        sideline: [
+          "Cheer positively—no coaching from sidelines",
+          "Cheer and remain respectful",
+        ],
+        comm: [
+          "Use team app for all questions",
+          "Email coach during office hours",
+        ],
+        attendance: [
+          "Arrive 15 min before practice",
+          "Notify coach 24 h in advance if absent",
+        ],
+        social: [
+          "No posting athlete names without consent",
+          "Team-approved photos only",
+        ],
+      };
+
+      function renderGuidelineGroups() {
+        const container = document.getElementById("guidelineGroups");
+        container.innerHTML = "";
+        for (const [key, items] of Object.entries(defaultGuidelines)) {
+          const labelMap = {
+            sideline: "Sideline behavior",
+            comm: "Communication with coaches",
+            attendance: "Attendance & punctuality",
+            social: "Social media",
+          };
+          const box = document.createElement("div");
+          box.className = "mb-6";
+          box.innerHTML = `
+      <p class="font-medium">${labelMap[key]}</p>
+      <div id="${key}Box" class="space-y-1">
+        ${items
+          .map(
+            (i) =>
+              `<label class="flex gap-2"><input type="checkbox" class="${key}Chk" value="${i}">${i}</label>`
+          )
+          .join("")}
+      </div>
+      <div class="flex gap-2 mt-2">
+        <input id="${key}Custom" class="flex-1 p-2 border rounded" placeholder="Add custom guideline">
+        <button type="button" class="px-3 py-1 bg-emerald-700 text-white rounded" onclick="addCustom('${key}')">Add</button>
+      </div>`;
+          container.appendChild(box);
+        }
+      }
+      renderGuidelineGroups();
+
+      /* === Navigation ========================================================= */
+      function showSlide(i) {
+        document
+          .querySelectorAll(".slide")
+          .forEach((s) => s.classList.remove("active"));
+        document.getElementById(`slide-${i}`).classList.add("active");
+        currentSlide = i;
+        document.getElementById("progressBar").style.width =
+          (i / (totalSlides - 1)) * 100 + "%";
+        if (i === 5) buildPoster();
+      }
+      function nextSlide() {
+        if (saveData()) showSlide(currentSlide + 1);
+      }
+      function prevSlide() {
+        showSlide(currentSlide - 1);
+      }
+
+      /* === Add custom checkboxes & values ===================================== */
+      function addCustom(group) {
+        const input = document.getElementById(group + "Custom");
+        const val = input.value.trim();
+        if (!val) return;
+        const box = document.getElementById(group + "Box");
+        const label = document.createElement("label");
+        label.className = "flex gap-2";
+        label.innerHTML = `<input type="checkbox" class="${group}Chk" checked value="${val}">${val}`;
+        box.appendChild(label);
+        input.value = "";
+      }
+      function addCustomValue() {
+        const input = document.getElementById("customValue");
+        const val = input.value.trim();
+        if (!val) return;
+        const grid = document.getElementById("valuesGrid");
+        const label = document.createElement("label");
+        label.className = "flex items-center gap-2";
+        label.innerHTML = `<input type="checkbox" class="valueChk" checked value="${val}">${val}`;
+        grid.appendChild(label);
+        input.value = "";
+      }
+
+      /* === Validation & save =================================================== */
+      function saveData() {
+        /* slide 1 */
+        if (currentSlide === 1) {
+          Object.assign(state, {
+            teamName: document.getElementById("teamName").value.trim(),
+            sport: document.getElementById("sport").value.trim(),
+            ageGroup: document.getElementById("ageGroup").value.trim(),
+            location: document.getElementById("location").value.trim(),
+            coachEmail: document.getElementById("coachEmail").value.trim(),
+          });
+          if (
+            !state.teamName ||
+            !state.sport ||
+            !state.ageGroup ||
+            !state.location
+          ) {
+            alert("Please fill all fields");
+            return false;
+          }
+        }
+
+        /* slide 2 */
+        if (currentSlide === 2) {
+          state.values = [
+            ...document.querySelectorAll(".valueChk:checked"),
+          ].map((c) => c.value);
+          if (state.values.length < 3) {
+            alert("Select at least three core values");
+            return false;
+          }
+        }
+
+        /* slide 3 */
+        if (currentSlide === 3) {
+          const grab = (cls) =>
+            [...document.querySelectorAll(`.${cls}Chk:checked`)].map(
+              (c) => c.value
+            );
+          state.guidelines.sideline = grab("sideline");
+          state.guidelines.comm = grab("comm");
+          state.guidelines.attendance = grab("attendance");
+          state.guidelines.social = grab("social");
+          if (Object.values(state.guidelines).some((a) => a.length === 0)) {
+            alert("Choose at least one item in each group");
+            return false;
+          }
+        }
+
+        /* slide 4 */
+        if (currentSlide === 4) {
+          state.safeSport.forms = document
+            .getElementById("safeForms")
+            .value.trim();
+          state.safeSport.apps = document
+            .getElementById("safeApps")
+            .value.trim();
+          state.safeSport.resources = document
+            .getElementById("safeResources")
+            .value.trim();
+          state.safeSport.additional = document
+            .getElementById("safeAdditional")
+            .value.trim();
+          if (
+            !state.safeSport.forms &&
+            !state.safeSport.apps &&
+            !state.safeSport.resources &&
+            !state.safeSport.additional
+          ) {
+            alert("Enter at least one Safe-Sport / welfare item");
+            return false;
+          }
+        }
+        return true;
+      }
+
+      /* === Build poster preview ============================================== */
+      function listItems(arr) {
+        return arr.map((i) => `<li>${i}</li>`).join("");
+      }
+      function buildPoster() {
+        const g = state.guidelines,
+          s = state.safeSport;
+        document.getElementById("posterPreview").innerHTML = `
+  <div class="poster-section bg-emerald-700 text-white flex justify-between items-center">
+    <div><h1 class="poster-title text-3xl uppercase">${
+      state.teamName
+    }</h1><p class="text-sm">${state.sport} • ${state.ageGroup}</p></div>
+    <p class="text-sm text-right">Location:&nbsp;${state.location}</p>
+  </div>
+
+  <div class="poster-section border-b">
+    <h2 class="poster-title text-2xl mb-2">Core Values</h2>
+    <ul class="list-disc pl-5 space-y-1 text-base">${listItems(
+      state.values
+    )}</ul>
+  </div>
+
+  <div class="poster-section border-b bg-emerald-50">
+    <h2 class="poster-title text-2xl mb-2">Parent Guidelines</h2>
+    <ul class="space-y-2 text-base">
+      <li><strong>Sideline:</strong><ul class="list-disc pl-6">${listItems(
+        g.sideline
+      )}</ul></li>
+      <li><strong>Communication:</strong><ul class="list-disc pl-6">${listItems(
+        g.comm
+      )}</ul></li>
+      <li><strong>Attendance &amp; Punctuality:</strong><ul class="list-disc pl-6">${listItems(
+        g.attendance
+      )}</ul></li>
+      <li><strong>Social Media:</strong><ul class="list-disc pl-6">${listItems(
+        g.social
+      )}</ul></li>
+    </ul>
+  </div>
+
+  <div class="poster-section border-b">
+    <h2 class="poster-title text-2xl mb-2">Safe Sport / Welfare</h2>
+    <ul class="space-y-2 text-base">
+      ${
+        s.forms
+          ? `<li><strong>Forms to sign:</strong><br>${s.forms.replace(
+              /\n/g,
+              "<br>"
+            )}</li>`
+          : ""
+      }
+      ${
+        s.apps
+          ? `<li><strong>Apps to download:</strong><br>${s.apps.replace(
+              /\n/g,
+              "<br>"
+            )}</li>`
+          : ""
+      }
+      ${
+        s.resources
+          ? `<li><strong>Online resources:</strong><br>${s.resources.replace(
+              /\n/g,
+              "<br>"
+            )}</li>`
+          : ""
+      }
+      ${
+        s.additional
+          ? `<li><strong>Additional safety info:</strong><br>${s.additional.replace(
+              /\n/g,
+              "<br>"
+            )}</li>`
+          : ""
+      }
+    </ul>
+  </div>
+
+  <div class='bg-emerald-100 p-2 rounded-lg'>
+      <p class='font-semibold text-emerald-800 text-sm'>Team Contact:</p>
+      <p class='text-emerald-700 break-all text-sm'><a href='mailto:${
+        state.coachEmail
+      }'>${state.coachEmail}</a></p>
+    </div>
+
+    
+  <div class="poster-section text-center text-sm bg-emerald-700 text-white">
+    Generated with <strong>Youth-Sports Parent Ethics Wizard</strong>
+  </div>`;
+      }
+
+      /* === PDF preview (opens new tab) ======================================= */
+      async function previewPDF() {
+        const btn = document.getElementById("previewBtn");
+        btn.disabled = true;
+        try {
+          const canvas = await html2canvas(
+            document.getElementById("posterPreview"),
+            { scale: 2, useCORS: true }
+          );
+          const imgData = canvas.toDataURL("image/png");
+
+          const { jsPDF } = window.jspdf;
+          const pdfW = 792,
+            pdfH = 1224; /* 11×17 in */
+          const pdf = new jsPDF({
+            orientation: "portrait",
+            unit: "pt",
+            format: [pdfW, pdfH],
+          });
+
+          const imgH = canvas.height * (pdfW / canvas.width);
+          let y = 0,
+            remain = imgH;
+
+          pdf.addImage(imgData, "PNG", 0, y, pdfW, imgH);
+          remain -= pdfH;
+
+          while (remain > 0) {
+            y -= pdfH;
+            pdf.addPage();
+            pdf.addImage(imgData, "PNG", 0, y, pdfW, imgH);
+            remain -= pdfH;
+          }
+
+          const url = pdf.output("bloburl");
+          window.open(url, "_blank");
+        } catch (err) {
+          alert("PDF preview failed. Try again in Chrome or Edge.");
+          console.error(err);
+        } finally {
+          btn.disabled = false;
+        }
+      }
+    </script>
+  </body>
+</html>
